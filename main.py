@@ -9,7 +9,7 @@ import logging as lg
 TOKEN = '236423438:AAH_98YQwozj62kufw1z2sON3vtHjR_TYK0'
 
 def start(bot, update):
-    bot.sendMessage(chat_id=update.message.chat_id, text='Hello! I love Aurorae!')
+    bot.sendMessage(chat_id=update.message.chat_id, text='Hello! I love Aurorae ^_^!')
 
 if __name__=='__main__':
     lg.basicConfig(level=lg.DEBUG,
