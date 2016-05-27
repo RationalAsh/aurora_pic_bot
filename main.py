@@ -10,7 +10,7 @@ TOKEN = '236423438:AAH_98YQwozj62kufw1z2sON3vtHjR_TYK0'
 
 #States of the bot
 START = 0
-PIC
+PIC = 2
 
 def start(bot, update):
     """Start off things with a welcome message and a description
