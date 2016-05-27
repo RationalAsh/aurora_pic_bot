@@ -4,28 +4,71 @@ import telegram
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
+from keys import *
 import logging as lg
+import os
 
-TOKEN = '236423438:AAH_98YQwozj62kufw1z2sON3vtHjR_TYK0'
+sys.path.insert(0, '/home/telegram_bots/api_keys')
 
 #States of the bot
-START = 0
-PIC = 2
+BOTSTATE = 0
+STARTMODE = 0
+PICMODE = 1
+
+#Inputs
+NEEDPICS = 'Give me pictures :D!'
+NOTHINGNOW = 'Nothing Right Now'
 
 def start(bot, update):
     """Start off things with a welcome message and a description
     of what the bot does."""
-    welcome_text = 'Hello Aurora! I\'m a bot that find and sends'+\
-                   'you beutiful pictures of aurorae! Ashwin made'+\
+    global BOTSTATE
+
+    BOTSTATE = STARTMODE
+
+    welcome_text = 'Hello Aurora! I\'m a bot that find and sends '+\
+                   'you beautiful pictures of aurorae! Ashwin made '+\
                    'me as a gift to you because he knows how much '+\
-                   'you love aurorae! Have fun!' + \
+                   'you love aurorae and because he loves you a lot!'+\
+                   ' Have fun!' + \
                    telegram.emoji.Emoji.SMILING_FACE_WITH_SMILING_EYES +\
                    '\n\n What do you want to do?'
-    custom_keyboard = [[ telegram.KeyboardButton('Give me pictures :D!'),
-                         telegram.KeyboardButton('Nothing Right Now')]]
+    
+    custom_keyboard = [[ telegram.KeyboardButton(NEEDPICS),
+                         telegram.KeyboardButton(NOTHINGNOW)]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard, resize_keybaord=True,
                                                 one_time_keyboard=True)
     bot.sendMessage(chat_id=update.message.chat_id, text=welcome_text, reply_markup=reply_markup)
+
+def unknown(bot, update):
+    """Handle unknown commands."""
+    unknown_resp = 'I\'m not quite sure what you are trying to tell me.'+\
+                   'I do not understand that command. Can you try again? '+\
+                   'Send /start to get started.'
+    bot.sendMessage(chat_id=update.message.chat_id, text=unknown_resp)
+
+def state_change(bot, update):
+    """Handle state changes by checking the reply from the custom keyboard."""
+    global BOTSTATE
+    user_req = update.message.text
+
+    bye_text = 'Okay! I\'m always here if you need pictures of aurorae! ^_^'
+
+    unknown_resp = 'I\'m not quite sure what you are trying to tell me.'+\
+                   'I do not understand that command. Can you try again? '+\
+                   'Send /start to get started.'
+
+    #If Aurora needs pics
+    if user_req == NEEDPICS:
+        BOTSTATE = PIC
+        #Get a random filename
+        #fname = getRandomFilename()
+        #Send picture
+    elif user_req == NOTHINGNOW:
+        bot.sendMessage(chat_id=update.message.chat_id, text=bye_text)
+    else:
+        bot.sendMessage(chat_id=update.message.chat_id, text=unknown_resp)
+    #print(user_req)
 
 def pause(updater):
     """Pauses the polling of the bot for testing purposes"""
@@ -33,15 +76,23 @@ def pause(updater):
 
 if __name__=='__main__':
     lg.basicConfig(level=lg.DEBUG,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    bot = telegram.Bot(token=TOKEN)
+    #Initialize the bot
+    bot = telegram.Bot(token=AURORABOT_TOKEN)
     print(bot.getMe())
     
+    #initialize the updater for polling
     updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
 
-    start_handler = CommandHandler('start', start)
-    dispatcher.add_handler(start_handler)
+    #Handle the start command.
+    dispatcher.add_handler(CommandHandler('start', start))
+
+    #Handle unknown commands
+    dispatcher.add_handler(MessageHandler([Filters.command], unknown))
+
+    #Handle state transitions
+    
     
     updater.start_polling()
