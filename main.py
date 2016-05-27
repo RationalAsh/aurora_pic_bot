@@ -8,6 +8,7 @@ from keys import *
 import logging as lg
 import sys
 from imgurpython import ImgurClient
+from random import randint
 
 sys.path.insert(0, '/home/telegram_bots/api_keys')
 
@@ -65,8 +66,9 @@ def state_change(bot, update):
         #Get a random filename
         links = getImageLinks()
         #Send random recent picture
+        randInd = randint(0,49)
         bot.sendPhoto(chat_id=update.message.chat_id, 
-                      photo=links[0])
+                      photo=links[randInd])
 
     elif user_req == NOTHINGNOW:
         bot.sendMessage(chat_id=update.message.chat_id, text=bye_text)
