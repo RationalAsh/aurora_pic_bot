@@ -6,7 +6,8 @@ from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
 from keys import *
 import logging as lg
-import os
+import sys
+from imgurpython import ImgurClient
 
 sys.path.insert(0, '/home/telegram_bots/api_keys')
 
@@ -60,10 +61,13 @@ def state_change(bot, update):
 
     #If Aurora needs pics
     if user_req == NEEDPICS:
-        BOTSTATE = PIC
+        BOTSTATE = PICMODE
         #Get a random filename
-        #fname = getRandomFilename()
-        #Send picture
+        links = getImageLinks()
+        #Send random recent picture
+        bot.sendPhoto(chat_id=update.message.chat_id, 
+                      photo=links[0])
+
     elif user_req == NOTHINGNOW:
         bot.sendMessage(chat_id=update.message.chat_id, text=bye_text)
     else:
@@ -74,6 +78,20 @@ def pause(updater):
     """Pauses the polling of the bot for testing purposes"""
     updater.stop()
 
+def getImageLinks(max_links=50):
+    #initialize client
+    client = ImgurClient(imgur_client_id, imgur_client_secret)
+    
+    #Get items
+    items = client.gallery(section='/r/earthporn', sort='newest', page=1,
+                           window='day', show_viral=False)
+
+    #Get links
+    links = [item.link for item in items]
+    
+    #Return list of links
+    return links[:max_links]
+
 if __name__=='__main__':
     lg.basicConfig(level=lg.DEBUG,
                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -81,9 +99,12 @@ if __name__=='__main__':
     #Initialize the bot
     bot = telegram.Bot(token=AURORABOT_TOKEN)
     print(bot.getMe())
+
+    #Initialize imgur
+    #imgur_client = ImgurClient(imgur_client_id, imgur_client_secret)
     
     #initialize the updater for polling
-    updater = Updater(token=TOKEN)
+    updater = Updater(token=AURORABOT_TOKEN)
     dispatcher = updater.dispatcher
 
     #Handle the start command.
@@ -93,6 +114,6 @@ if __name__=='__main__':
     dispatcher.add_handler(MessageHandler([Filters.command], unknown))
 
     #Handle state transitions
-    
+    dispatcher.add_handler(MessageHandler([Filters.text], state_change))
     
     updater.start_polling()
