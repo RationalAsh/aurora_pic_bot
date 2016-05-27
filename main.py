@@ -63,6 +63,9 @@ def state_change(bot, update):
     #If Aurora needs pics
     if user_req == NEEDPICS:
         BOTSTATE = PICMODE
+        #Send chat action
+        bot.sendChatAction(chat_id=update.message.chat_id,
+                           action=telegram.ChatAction.UPLOAD_PHOTO)
         #Get a random filename
         links = getImageLinks()
         #Send random recent picture
