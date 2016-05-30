@@ -32,7 +32,7 @@ SUBJECTS = {'EARTH':'/r/earthporn',
             'HISTORY': '/r/historyporn',
             'KITTENS': '/r/kittens',
             'CUTENESS': '/r/aww'}
-CURRENT_SUBJECT = '/r/earthporn'
+CURRENT_SUBJECT = '/r/spaceporn'
 # EARTH = '/r/earthporn'
 # SPACE = '/r/spaceporn'
 # FOOD = '/r/foodporn'
