@@ -25,6 +25,21 @@ PICMODE = 1
 NEEDPICS = 'Give me pictures :D!'
 NOTHINGNOW = 'Nothing Right Now'
 
+#Subjects
+SUBJECTS = {'EARTH':'/r/earthporn',
+            'SPACE': '/r/spaceporn',
+            'FOOD': '/r/foodporn',
+            'HISTORY': '/r/historyporn',
+            'KITTENS': '/r/kittens',
+            'CUTENESS': '/r/aww'}
+CURRENT_SUBJECT = '/r/earthporn'
+# EARTH = '/r/earthporn'
+# SPACE = '/r/spaceporn'
+# FOOD = '/r/foodporn'
+# HISTORY = '/r/historyporn'
+# KITTENS = '/r/kittens'
+# CUTENESS = '/r/aww'
+
 def start(bot, update):
     """Start off things with a welcome message and a description
     of what the bot does."""
@@ -36,15 +51,26 @@ def start(bot, update):
                    'you beautiful pictures of earth and space! Ashwin made '+\
                    'me as a gift to you because he knows how much '+\
                    'you love the stars and earth and because he loves you a lot!'+\
-                   ' Have fun!' + \
+                   ' Have fun!\n\n' + \
+                   'If you want to change the subject of the pictures use the command: \n'+\
+                   '/subject'+\
                    telegram.emoji.Emoji.SMILING_FACE_WITH_SMILING_EYES +\
                    '\n\n What do you want to do?'
     
-    custom_keyboard = [[ telegram.KeyboardButton(NEEDPICS),
-                         telegram.KeyboardButton(NOTHINGNOW)]]
+    custom_keyboard = [[telegram.KeyboardButton(NEEDPICS)],
+                       [telegram.KeyboardButton(NOTHINGNOW)]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard, resize_keybaord=True,
                                                 one_time_keyboard=True)
     bot.sendMessage(chat_id=update.message.chat_id, text=welcome_text, reply_markup=reply_markup)
+
+def subject(bot, update):
+    """Set the subject of the images from the ones available."""
+    help_text = 'Select which subject you want images of.'
+    custom_keyboard = [[telegram.KeyboardButton(SUB)] for SUB in SUBJECTS.keys()]
+    reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard, resize_keyboard=False,
+                                                one_time_keyboard=True)
+    bot.sendMessage(chat_id=update.message.chat_id, text=help_text,
+                    reply_markup=reply_markup)
 
 def unknown(bot, update):
     """Handle unknown commands."""
@@ -56,6 +82,8 @@ def unknown(bot, update):
 def state_change(bot, update):
     """Handle state changes by checking the reply from the custom keyboard."""
     global BOTSTATE
+    global CURRENT_SUBJECT
+
     user_req = update.message.text
 
     bye_text = 'Okay! I\'m always here if you need pictures of aurorae! ^_^'
@@ -63,6 +91,11 @@ def state_change(bot, update):
     unknown_resp = 'I\'m not quite sure what you are trying to tell me.'+\
                    'I do not understand that command. Can you try again? '+\
                    'Send /start to get started.'
+
+    custom_keyboard = [[ telegram.KeyboardButton(NEEDPICS),
+                         telegram.KeyboardButton(NOTHINGNOW)]]
+    reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard, resize_keybaord=True,
+                                                one_time_keyboard=True)
 
     #If Aurora needs pics
     if user_req == NEEDPICS:
@@ -79,6 +112,11 @@ def state_change(bot, update):
 
     elif user_req == NOTHINGNOW:
         bot.sendMessage(chat_id=update.message.chat_id, text=bye_text)
+    elif user_req in SUBJECTS.keys():
+        #Change the current subject to the requested one
+        CURRENT_SUBJECT = SUBJECTS[user_req]
+        bot.sendMessage(chat_id=update.message.chat_id, text='What do you want right now?', 
+                        reply_markup=reply_markup)
     else:
         bot.sendMessage(chat_id=update.message.chat_id, text=unknown_resp)
     #print(user_req)
@@ -118,7 +156,7 @@ def getImageLinks(pagenum=1, max_links=50):
     client = ImgurClient(imgur_client_id, imgur_client_secret)
     
     #Get items
-    items = client.gallery(section='/r/earthporn', sort='time', page=pagenum,
+    items = client.gallery(section=CURRENT_SUBJECT, sort='time', page=pagenum,
                            window='day', show_viral=False)
 
     #Get links
@@ -146,6 +184,8 @@ if __name__=='__main__':
 
     #Handle the start command.
     dispatcher.add_handler(CommandHandler('start', start))
+    #Handle the subject command.
+    dispatcher.add_handler(CommandHandler('subject', subject))
 
     #Handle inline queries
     dispatcher.add_handler(InlineQueryHandler(inline_query))
