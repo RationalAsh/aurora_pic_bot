@@ -87,7 +87,7 @@ def get_thumb_url(url):
     """Helper function to get the thumbnail URL of an imgur image"""
     #Find the . of the extension from the end
     idx = -url[::-1].find('.') - 1
-    thumb_url = url[:idx] + 's' + url[idx:]
+    thumb_url = url[:idx] + 'l' + url[idx:]
     return thumb_url
 
 def inline_query(bot, update):
@@ -113,12 +113,12 @@ def pause(updater):
     """Pauses the polling of the bot for testing purposes"""
     updater.stop()
 
-def getImageLinks(page=1, max_links=50):
+def getImageLinks(pagenum=1, max_links=50):
     #initialize client
     client = ImgurClient(imgur_client_id, imgur_client_secret)
     
     #Get items
-    items = client.gallery(section='/r/earthporn', sort='top', page=1,
+    items = client.gallery(section='/r/earthporn', sort='top', page=pagenum,
                            window='day', show_viral=False)
 
     #Get links
