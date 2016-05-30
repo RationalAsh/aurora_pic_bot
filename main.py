@@ -118,7 +118,7 @@ def getImageLinks(pagenum=1, max_links=50):
     client = ImgurClient(imgur_client_id, imgur_client_secret)
     
     #Get items
-    items = client.gallery(section='/r/earthporn', sort='top', page=pagenum,
+    items = client.gallery(section='/r/earthporn', sort='time', page=pagenum,
                            window='day', show_viral=False)
 
     #Get links
