@@ -4,11 +4,15 @@ import telegram
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
+from telegram.ext import InlineQueryHandler
+from telegram import InlineQueryResultPhoto
+
 from keys import *
 import logging as lg
 import sys
 from imgurpython import ImgurClient
 from random import randint
+from uuid import uuid4
 
 sys.path.insert(0, '/home/telegram_bots/api_keys')
 
@@ -29,9 +33,9 @@ def start(bot, update):
     BOTSTATE = STARTMODE
 
     welcome_text = 'Hello Aurora! I\'m a bot that find and sends '+\
-                   'you beautiful pictures of aurorae! Ashwin made '+\
+                   'you beautiful pictures of earth and space! Ashwin made '+\
                    'me as a gift to you because he knows how much '+\
-                   'you love aurorae and because he loves you a lot!'+\
+                   'you love the stars and earth and because he loves you a lot!'+\
                    ' Have fun!' + \
                    telegram.emoji.Emoji.SMILING_FACE_WITH_SMILING_EYES +\
                    '\n\n What do you want to do?'
@@ -79,6 +83,24 @@ def state_change(bot, update):
         bot.sendMessage(chat_id=update.message.chat_id, text=unknown_resp)
     #print(user_req)
 
+def get_thumb_url(url):
+    """Helper function to get the thumbnail URL of an imgur image"""
+    #Find the . of the extension from the end
+    idx = -url[::-1].find('.') - 1
+    thumb_url = url[:idx] + 's' + url[idx:]
+    return thumb_url
+
+def inline_query(bot, update):
+    """Respond to inline query with images of earth and space."""
+    query = update.inline_query.query
+    
+    links, titles = getImageLinks()
+
+    results = [InlineQueryResultPhoto(id=uuid4(), photo_url=link, 
+                                      thumb_url=get_thumb_url(link),
+                                      title=tit) for link, tit in zip(links, titles)]
+    bot.answerInlineQuery(update.inline_query.id, results)
+
 def pause(updater):
     """Pauses the polling of the bot for testing purposes"""
     updater.stop()
@@ -116,6 +138,9 @@ if __name__=='__main__':
 
     #Handle the start command.
     dispatcher.add_handler(CommandHandler('start', start))
+
+    #Handle inline queries
+    dispatcher.add_handler(InlineQueryHandler(inline_query))
 
     #Handle unknown commands
     dispatcher.add_handler(MessageHandler([Filters.command], unknown))
