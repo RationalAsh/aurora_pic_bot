@@ -67,11 +67,11 @@ def state_change(bot, update):
         bot.sendChatAction(chat_id=update.message.chat_id,
                            action=telegram.ChatAction.UPLOAD_PHOTO)
         #Get a random filename
-        links = getImageLinks()
+        links, titles = getImageLinks()
         #Send random recent picture
         randInd = randint(0,49)
         bot.sendPhoto(chat_id=update.message.chat_id, 
-                      photo=links[randInd])
+                      photo=links[randInd], caption=titles[randInd])
 
     elif user_req == NOTHINGNOW:
         bot.sendMessage(chat_id=update.message.chat_id, text=bye_text)
@@ -93,9 +93,11 @@ def getImageLinks(max_links=50):
 
     #Get links
     links = [item.link for item in items]
+    #Get image titles
+    titles = [item.title for item in items]
     
     #Return list of links
-    return links[:max_links]
+    return links[:max_links], titles[:max_links]
 
 if __name__=='__main__':
     lg.basicConfig(level=lg.DEBUG,
