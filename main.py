@@ -93,8 +93,16 @@ def get_thumb_url(url):
 def inline_query(bot, update):
     """Respond to inline query with images of earth and space."""
     query = update.inline_query.query
+
+    pagenum = 1
+
+    #If the query is an integer, interpret as page number
+    try:
+        pagenum = int(query)
+    except:
+        pass
     
-    links, titles = getImageLinks()
+    links, titles = getImageLinks(pagenum)
 
     results = [InlineQueryResultPhoto(id=uuid4(), photo_url=link, 
                                       thumb_url=get_thumb_url(link),
@@ -105,12 +113,12 @@ def pause(updater):
     """Pauses the polling of the bot for testing purposes"""
     updater.stop()
 
-def getImageLinks(max_links=50):
+def getImageLinks(page=1, max_links=50):
     #initialize client
     client = ImgurClient(imgur_client_id, imgur_client_secret)
     
     #Get items
-    items = client.gallery(section='/r/earthporn', sort='newest', page=1,
+    items = client.gallery(section='/r/earthporn', sort='top', page=1,
                            window='day', show_viral=False)
 
     #Get links
