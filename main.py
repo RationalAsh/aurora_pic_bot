@@ -109,7 +109,7 @@ def state_change(bot, update):
         #Send random recent picture
         randInd = randint(0,49)
         bot.sendPhoto(chat_id=update.message.chat_id, 
-                      photo=links[randInd], caption=titles[randInd])
+                      photo=links[randInd], caption=titles[randInd]+'\n'+links[randInd])
 
     elif user_req == NOTHINGNOW:
         bot.sendMessage(chat_id=update.message.chat_id, text=bye_text)
@@ -141,9 +141,8 @@ def inline_query(bot, update):
         pass
     
     links, titles = getImageLinks(pagenum)
-    results = [InlineQueryResultPhoto(id=uuid4(), photo_url=link, 
-                                      thumb_url=get_thumb_url(link),
-                                      caption=tit) for link, tit in zip(links, titles)]
+    results = [InlineQueryResultPhoto(id=uuid4(), photo_url=link,thumb_url=get_thumb_url(link),
+                                      caption=tit+'\n'+link) for link, tit in zip(links, titles)]
     bot.answerInlineQuery(update.inline_query.id, results)
 
 def pause(updater):
