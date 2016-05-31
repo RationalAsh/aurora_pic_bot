@@ -31,7 +31,8 @@ SUBJECTS = {'EARTH':'/r/earthporn',
             'FOOD': '/r/foodporn',
             'HISTORY': '/r/historyporn',
             'KITTENS': '/r/kittens',
-            'CUTENESS': '/r/aww'}
+            'CUTENESS': '/r/aww',
+            'ASTRONOMY': '/r/astronomy'}
 CURRENT_SUBJECT = '/r/spaceporn'
 # EARTH = '/r/earthporn'
 # SPACE = '/r/spaceporn'
@@ -131,7 +132,6 @@ def get_thumb_url(url):
 def inline_query(bot, update):
     """Respond to inline query with images of earth and space."""
     query = update.inline_query.query
-
     pagenum = 1
 
     #If the query is an integer, interpret as page number
@@ -141,7 +141,6 @@ def inline_query(bot, update):
         pass
     
     links, titles = getImageLinks(pagenum)
-
     results = [InlineQueryResultPhoto(id=uuid4(), photo_url=link, 
                                       thumb_url=get_thumb_url(link),
                                       title=tit) for link, tit in zip(links, titles)]
