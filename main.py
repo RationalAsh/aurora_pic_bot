@@ -143,7 +143,7 @@ def inline_query(bot, update):
     links, titles = getImageLinks(pagenum)
     results = [InlineQueryResultPhoto(id=uuid4(), photo_url=link,thumb_url=get_thumb_url(link),
                                       caption=tit+'\n'+link) for link, tit in zip(links, titles)]
-    bot.answerInlineQuery(update.inline_query.id, results)
+    bot.answerInlineQuery(update.inline_query.id, results, cache_time=20)
 
 def pause(updater):
     """Pauses the polling of the bot for testing purposes"""
